@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מה קו-רגש — מסע אל תוך הרגש</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#241522;
+  --ink-2:#33203a;
+  --parchment:#f8efe0;
+  --parchment-2:#efe2c9;
+  --coral:#e8604f;
+  --coral-d:#b8402f;
+  --indigo:#4a5a9e;
+  --indigo-d:#323f78;
+  --magenta:#c9457a;
+  --magenta-d:#8f2e58;
+  --gold:#c9932a;
+  --gold-d:#93691a;
+  --sage:#4f8a5b;
+  --sage-d:#2f6440;
+  --teal:#2f8f89;
+  --teal-d:#1e625e;
+  --cream-ink:#3a2a20;
+  --shadow: 0 14px 30px -10px rgba(20,8,20,.55);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1200px 700px at 15% -10%, #3a2440 0%, transparent 60%),
+    radial-gradient(1000px 800px at 110% 20%, #2d3a5c 0%, transparent 55%),
+    linear-gradient(160deg, var(--ink) 0%, #1a0f1c 100%);
+  color:var(--parchment);
+  font-family:'Rubik',sans-serif;
+  min-height:100vh;
+  padding:0 0 60px;
+  overflow-x:hidden;
+}
+::selection{background:var(--gold); color:#241522;}
+
+/* ---------- grain overlay ---------- */
+.grain-overlay{
+  position:fixed; inset:0; pointer-events:none; z-index:999;
+  opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- header ---------- */
+header{
+  text-align:center;
+  padding:38px 20px 20px;
+  position:relative;
+}
+header .eyebrow{
+  font-family:'Rubik',sans-serif; font-size:12px; letter-spacing:.35em;
+  color:var(--gold); text-transform:uppercase; font-weight:600;
+  opacity:.85;
+}
+header h1{
+  font-family:'Frank Ruhl Libre',serif; font-weight:900;
+  font-size:clamp(30px,5.5vw,54px);
+  margin:8px 0 6px;
+  background:linear-gradient(90deg,#f8efe0,#e8c98a 45%,#e8604f 90%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  letter-spacing:.01em;
+}
+header p.sub{
+  max-width:640px; margin:0 auto; font-size:15px; line-height:1.7;
+  color:#e4d6c9; opacity:.85;
+}
+.letters-row{
+  display:flex; justify-content:center; gap:10px; margin:22px 0 4px; flex-wrap:wrap;
+}
+.letter-chip{
+  display:flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+  padding:8px 16px; border-radius:100px; font-size:13px; color:#eadfce;
+}
+.letter-chip b{
+  font-family:'Frank Ruhl Libre',serif; font-size:16px;
+}
+.letter-chip.ch-a b{color:var(--coral);}
+.letter-chip.ch-p b{color:var(--indigo);}
+.letter-chip.ch-r b{color:var(--magenta);}
+.letter-chip.ch-t b{color:var(--gold);}
+
+/* ---------- board ---------- */
+.board-wrap{
+  max-width:1180px; margin:34px auto 0; padding:0 20px;
+}
+.board{
+  background:linear-gradient(155deg, rgba(255,255,255,.045), rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:28px;
+  padding:26px;
+  position:relative;
+  backdrop-filter:blur(2px);
+}
+.row-label{
+  display:flex; align-items:center; gap:10px; margin:0 0 12px 0;
+  font-family:'Frank Ruhl Libre',serif; font-size:19px; font-weight:700;
+}
+.row-label .dot{width:10px;height:10px;border-radius:50%;}
+.row-label.row-real .dot{background:var(--coral);}
+.row-label.row-real{color:#f3d3c9;}
+.row-label.row-alt .dot{background:var(--sage);}
+.row-label.row-alt{color:#cdead4;}
+.row-label small{font-family:'Rubik',sans-serif; font-weight:400; font-size:12px; opacity:.65; margin-inline-start:6px;}
+
+.track{
+  display:grid;
+  grid-template-columns: 1.05fr 1fr 1.25fr 1fr;
+  gap:14px;
+  align-items:stretch;
+  position:relative;
+}
+.track.row-alt{margin-top:26px;}
+.arrow-connector{
+  display:flex; align-items:center; justify-content:center;
+  opacity:.55;
+}
+.arrow-connector svg{width:26px;height:26px;}
+.row-real .arrow-connector svg{stroke:var(--coral);}
+.row-alt .arrow-connector svg{stroke:var(--sage);}
+
+.fork-wrap{
+  display:flex; align-items:center; justify-content:center; margin:6px 0;
+  color:var(--gold); opacity:.8; gap:10px; font-size:12px;
+}
+.fork-wrap svg{width:40px;height:40px;}
+
+/* ---------- slot & card ---------- */
+.slot{
+  border-radius:20px;
+  min-height:220px;
+  cursor:pointer;
+  position:relative;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform .18s ease, box-shadow .18s ease;
+  user-select:none;
+}
+.slot:hover{transform:translateY(-3px);}
+.slot.empty{
+  border:2px dashed rgba(255,255,255,.22);
+  background:rgba(255,255,255,.025);
+}
+.slot.empty .placeholder{
+  text-align:center; color:rgba(248,239,224,.55); font-size:13px; padding:14px;
+}
+.slot.empty .placeholder .plus{
+  font-size:26px; display:block; margin-bottom:6px; color:rgba(248,239,224,.4);
+}
+.slot.locked{opacity:.5; cursor:not-allowed;}
+.slot.locked .placeholder{color:rgba(248,239,224,.3);}
+
+.card{
+  width:100%; height:100%;
+  border-radius:18px;
+  background:linear-gradient(165deg, var(--parchment), var(--parchment-2));
+  box-shadow:var(--shadow);
+  padding:14px;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  gap:8px;
+  position:relative;
+  color:var(--cream-ink);
+  border:1px solid rgba(255,255,255,.5);
+  animation:cardIn .38s cubic-bezier(.2,.9,.25,1.2);
+}
+@keyframes cardIn{
+  from{opacity:0; transform:scale(.82) translateY(10px) rotate(-3deg);}
+  to{opacity:1; transform:scale(1) translateY(0) rotate(0);}
+}
+.card .icon-frame{
+  width:76px; height:76px; margin-top:2px;
+}
+.card .icon-frame svg{width:100%; height:100%;}
+.card .card-label{
+  font-family:'Rubik',sans-serif; font-weight:700; font-size:15px;
+  text-align:center; line-height:1.35;
+}
+.card .card-kicker{
+  font-size:10px; letter-spacing:.12em; text-transform:uppercase; opacity:.55; font-weight:600;
+}
+.card .edit-x{
+  position:absolute; top:8px; left:8px; width:22px;height:22px; border-radius:50%;
+  background:rgba(0,0,0,.12); color:var(--cream-ink); border:none; font-size:13px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.card .edit-x:hover{background:rgba(0,0,0,.22);}
+
+/* emotion multi card */
+.card.emotion-multi{gap:6px; padding:12px;}
+.emo-chip-list{width:100%; display:flex; flex-direction:column; gap:8px;}
+.emo-chip{
+  background:rgba(255,255,255,.5); border-radius:12px; padding:6px 10px;
+  display:flex; align-items:center; gap:8px; position:relative;
+  overflow:hidden;
+}
+.emo-remove{
+  flex:none; width:22px;height:22px;border-radius:50%; border:none; cursor:pointer;
+  background:rgba(0,0,0,.12); color:var(--cream-ink); font-size:11px;
+  display:flex; align-items:center; justify-content:center; transition:background .15s ease, color .15s ease;
+}
+.emo-remove:hover{background:rgba(184,64,47,.3); color:#8f2e58;}
+.emo-chip .emo-icon{width:34px;height:34px; flex:none; transition:transform .15s ease; transform-origin:center;}
+.emo-chip .emo-icon svg{width:100%;height:100%;}
+.emo-chip .emo-meta{flex:1; text-align:right;}
+.emo-chip .emo-name{font-family:'Rubik',sans-serif; font-weight:700; font-size:13px;}
+.emo-chip .emo-slider{width:100%; margin-top:3px; accent-color:var(--magenta);}
+.emo-chip .emo-val{font-size:10px; opacity:.65;}
+.emo-add-btn{
+  font-size:11.5px; border:1.5px dashed rgba(0,0,0,.28); background:transparent; border-radius:10px;
+  padding:7px 10px; cursor:pointer; color:var(--cream-ink); opacity:.8; width:100%;
+  font-family:'Rubik',sans-serif; font-weight:600; transition:opacity .15s ease, border-color .15s ease;
+}
+.emo-add-btn:hover{opacity:1; border-color:var(--gold);}
+
+/* category tints for card kicker/edge */
+.card.cat-event{box-shadow:var(--shadow), inset 0 0 0 3px rgba(232,96,79,.22);}
+.card.cat-thought{box-shadow:var(--shadow), inset 0 0 0 3px rgba(74,90,158,.22);}
+.card.cat-alt-thought{box-shadow:var(--shadow), inset 0 0 0 3px rgba(47,143,137,.24);}
+.card.cat-emotion{box-shadow:var(--shadow), inset 0 0 0 3px rgba(201,69,122,.22);}
+.card.cat-emotion-alt{box-shadow:var(--shadow), inset 0 0 0 3px rgba(79,138,91,.24);}
+.card.cat-action{box-shadow:var(--shadow), inset 0 0 0 3px rgba(201,147,42,.24);}
+.card.cat-action-alt{box-shadow:var(--shadow), inset 0 0 0 3px rgba(47,143,137,.24);}
+
+/* ---------- actions bar ---------- */
+.actions-bar{
+  display:flex; justify-content:center; gap:14px; margin:34px auto 0; flex-wrap:wrap;
+}
+.btn{
+  font-family:'Rubik',sans-serif; font-weight:600; font-size:14px;
+  padding:13px 26px; border-radius:100px; border:none; cursor:pointer;
+  display:flex; align-items:center; gap:8px;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn-primary{background:linear-gradient(90deg,var(--gold),#e0b34e); color:#2a1c08; box-shadow:0 10px 24px -8px rgba(201,147,42,.55);}
+.btn-primary:disabled{opacity:.4; cursor:not-allowed; transform:none; box-shadow:none;}
+.btn-ghost{background:rgba(255,255,255,.06); color:#f1e6d6; border:1px solid rgba(255,255,255,.18);}
+.btn-ghost:hover{background:rgba(255,255,255,.12);}
+
+/* ---------- modal / drawer ---------- */
+.overlay{
+  position:fixed; inset:0; background:rgba(15,7,15,.72); backdrop-filter:blur(3px);
+  display:none; align-items:flex-end; justify-content:center; z-index:200;
+  animation:fadeIn .2s ease;
+}
+.overlay.open{display:flex;}
+@keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+.drawer{
+  width:100%; max-width:900px; max-height:82vh; overflow-y:auto;
+  background:linear-gradient(180deg,#2c1a2e,#20121f);
+  border-radius:26px 26px 0 0;
+  padding:22px 20px 34px;
+  border-top:1px solid rgba(255,255,255,.12);
+  animation:slideUp .28s cubic-bezier(.2,.9,.25,1.1);
+}
+@media(min-width:700px){
+  .overlay{align-items:center;}
+  .drawer{border-radius:26px; max-height:80vh;}
+}
+@keyframes slideUp{from{transform:translateY(40px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+.drawer h3{
+  font-family:'Frank Ruhl Libre',serif; font-size:22px; margin:0 0 4px; color:var(--parchment);
+}
+.drawer p.hint{font-size:13px; opacity:.6; margin:0 0 18px;}
+.drawer-close{
+  position:absolute; top:14px; left:14px; background:rgba(255,255,255,.08); border:none;
+  width:32px;height:32px;border-radius:50%; color:#fff; cursor:pointer; font-size:16px;
+}
+.pick-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px;
+}
+.pick-card{
+  background:linear-gradient(165deg, var(--parchment), var(--parchment-2));
+  border-radius:16px; padding:12px 8px; cursor:pointer; text-align:center;
+  border:2px solid transparent; transition:transform .12s ease, border-color .12s ease;
+  color:var(--cream-ink); display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.pick-card:hover{transform:translateY(-3px) scale(1.03); border-color:var(--gold);}
+.pick-card.selected{border-color:var(--sage); box-shadow:0 0 0 3px rgba(79,138,91,.25);}
+.pick-card .icon-frame{width:52px;height:52px;}
+.pick-card .icon-frame svg{width:100%;height:100%;}
+.pick-card .pc-label{font-family:'Rubik',sans-serif; font-weight:600; font-size:12.5px; line-height:1.3;}
+.suggest-note{
+  font-size:11.5px; background:rgba(201,147,42,.14); color:#e9c987; border:1px solid rgba(201,147,42,.3);
+  padding:8px 12px; border-radius:12px; margin-bottom:14px;
+}
+.pick-card.is-custom{border-color:rgba(201,147,42,.55);}
+.pick-card .custom-badge{
+  font-size:9px; background:var(--gold); color:#2a1c08; padding:1px 7px; border-radius:100px;
+  font-weight:700; letter-spacing:.03em;
+}
+.custom-add{
+  margin-top:18px; padding-top:16px; border-top:1px dashed rgba(255,255,255,.15);
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.custom-add input[type="text"]{
+  flex:1; min-width:180px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+  color:var(--parchment); padding:11px 14px; border-radius:12px; font-family:'Rubik',sans-serif; font-size:14px;
+}
+.custom-add input[type="text"]::placeholder{color:rgba(248,239,224,.4);}
+.custom-add input[type="text"]:focus{outline:none; border-color:var(--gold);}
+.custom-add button{
+  background:linear-gradient(90deg,var(--gold),#e0b34e); color:#2a1c08; border:none; font-weight:700;
+  padding:11px 18px; border-radius:12px; cursor:pointer; font-family:'Rubik',sans-serif; font-size:13px; white-space:nowrap;
+}
+.custom-add button:hover{filter:brightness(1.06);}
+.custom-add-note{width:100%; font-size:11px; opacity:.55; margin-top:-2px;}
+.storage-note{
+  font-size:11px; text-align:center; opacity:.5; margin-top:10px;
+}
+
+/* ---------- summary ---------- */
+#summary{
+  max-width:1180px; margin:44px auto 0; padding:0 20px; display:none;
+}
+#summary.open{display:block;}
+.summary-card{
+  background:linear-gradient(160deg,#2c1a2e,#1c1020);
+  border:1px solid rgba(255,255,255,.12); border-radius:28px; padding:32px;
+}
+.summary-title{
+  font-family:'Frank Ruhl Libre',serif; font-size:26px; text-align:center; margin:0 0 4px;
+  color:var(--parchment);
+}
+.summary-sub{text-align:center; font-size:13px; opacity:.6; margin:0 0 26px;}
+.summary-cols{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+@media(max-width:760px){.summary-cols{grid-template-columns:1fr;}}
+.summary-col{
+  border-radius:20px; padding:18px; background:rgba(255,255,255,.035);
+}
+.summary-col.real{border:1px solid rgba(232,96,79,.35);}
+.summary-col.alt{border:1px solid rgba(79,138,91,.4);}
+.summary-col h4{
+  font-family:'Frank Ruhl Libre',serif; margin:0 0 14px; font-size:17px;
+  display:flex; align-items:center; gap:8px;
+}
+.summary-col.real h4{color:#f3b7a8;}
+.summary-col.alt h4{color:#a9dcb6;}
+.summary-item{
+  display:flex; gap:10px; align-items:flex-start; padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,.06); font-size:13.5px;
+}
+.summary-item:last-child{border-bottom:none;}
+.summary-item .si-icon{width:30px;height:30px;flex:none; margin-top:1px;}
+.summary-item .si-icon svg{width:100%;height:100%;}
+.summary-item b{font-family:'Rubik',sans-serif;}
+.summary-actions{display:flex; justify-content:center; gap:14px; margin-top:26px;}
+
+footer{
+  text-align:center; margin-top:50px; font-size:11.5px; opacity:.4; padding:0 20px;
+}
+
+@media(max-width:820px){
+  .track{grid-template-columns:1fr 1fr;}
+  .track .fork-slot{grid-column:1 / -1;}
+  .arrow-connector{transform:rotate(90deg);}
+}
+</style>
+</head>
+<body>
+<div class="grain-overlay"></div>
+
+<!-- ============ ICON LIBRARY ============ -->
+<svg width="0" height="0" style="position:absolute">
+<defs id="icon-defs">
+  <radialGradient id="grad-event" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#ff9a7a"/><stop offset="55%" stop-color="#e8604f"/><stop offset="100%" stop-color="#a5372a"/>
+  </radialGradient>
+  <radialGradient id="grad-thought" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#8b9adf"/><stop offset="55%" stop-color="#4a5a9e"/><stop offset="100%" stop-color="#2b3568"/>
+  </radialGradient>
+  <radialGradient id="grad-thought-alt" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#6fd6cf"/><stop offset="55%" stop-color="#2f8f89"/><stop offset="100%" stop-color="#175753"/>
+  </radialGradient>
+  <radialGradient id="grad-emotion" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#ec8bb2"/><stop offset="55%" stop-color="#c9457a"/><stop offset="100%" stop-color="#7c2650"/>
+  </radialGradient>
+  <radialGradient id="grad-emotion-alt" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#9fd6a9"/><stop offset="55%" stop-color="#4f8a5b"/><stop offset="100%" stop-color="#2a5133"/>
+  </radialGradient>
+  <radialGradient id="grad-action" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#f0cc7c"/><stop offset="55%" stop-color="#c9932a"/><stop offset="100%" stop-color="#7c5714"/>
+  </radialGradient>
+  <radialGradient id="grad-action-alt" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#6fd6cf"/><stop offset="55%" stop-color="#2f8f89"/><stop offset="100%" stop-color="#175753"/>
+  </radialGradient>
+  <filter id="grain-f" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0"/>
+    <feComposite operator="over" in2="SourceGraphic"/>
+  </filter>
+</defs>
+</svg>
+
+<header>
+  <div class="eyebrow">משחק קלפים לעיבוד רגשי · שיטת CBT</div>
+  <h1>מה קו-רגש?</h1>
+  <p class="sub">בנה/י את השרשרת שקרתה באמת, ואז עצרו רגע בתחנת המחשבה — ובחרו יחד איתי מחשבה אחרת, וצרו במודע מציאות חדשה שתרצו לבסס לעתיד.</p>
+  <div class="letters-row">
+    <div class="letter-chip ch-a"><b>א</b> אירוע</div>
+    <div class="letter-chip ch-p"><b>פ</b> פרשנות / מחשבה</div>
+    <div class="letter-chip ch-r"><b>ר</b> רגש</div>
+    <div class="letter-chip ch-t"><b>ת</b> תוצאה</div>
+  </div>
+</header>
+
+<div class="board-wrap">
+  <div class="board">
+
+    <div class="row-label row-real"><span class="dot"></span> מה שקרה <small>הרצף שאני מזהה שהיה</small></div>
+    <div class="track row-real" id="track-real">
+      <div class="slot empty" data-row="real" data-cat="event" id="slot-real-event">
+        <div class="placeholder"><span class="plus">＋</span>בחר/י אירוע</div>
+      </div>
+      <div class="arrow-connector"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H4M9 6l-5 6 5 6"/></svg></div>
+      <div class="slot empty locked" data-row="real" data-cat="thought" id="slot-real-thought">
+        <div class="placeholder"><span class="plus">＋</span>מחשבה אוטומטית</div>
+      </div>
+      <div class="arrow-connector"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H4M9 6l-5 6 5 6"/></svg></div>
+      <div class="slot empty locked" data-row="real" data-cat="emotion" id="slot-real-emotion">
+        <div class="placeholder"><span class="plus">＋</span>רגש/ות שהתעוררו</div>
+      </div>
+    </div>
+    <div class="track row-real" style="grid-template-columns:1fr auto 1fr; margin-top:10px;">
+      <div></div>
+      <div class="arrow-connector"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H4M9 6l-5 6 5 6"/></svg></div>
+      <div class="slot empty locked" data-row="real" data-cat="action" id="slot-real-action">
+        <div class="placeholder"><span class="plus">＋</span>מה עשיתי בפועל</div>
+      </div>
+    </div>
+
+    <div class="fork-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v6M12 9c0 4-6 3-6 8M12 9c0 4 6 3 6 8" stroke-linecap="round"/></svg>
+      עצרו כאן. אותו אירוע — מחשבה אחרת אפשרית?
+    </div>
+
+    <div class="row-label row-alt"><span class="dot"></span> המציאות שאני בוחר <small>רצף אלטרנטיבי מודע</small></div>
+    <div class="track row-alt" id="track-alt">
+      <div class="slot locked" data-row="alt" data-cat="event" id="slot-alt-event">
+        <div class="placeholder">אותו אירוע (קבוע)</div>
+      </div>
+      <div class="arrow-connector"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H4M9 6l-5 6 5 6"/></svg></div>
+      <div class="slot empty locked" data-row="alt" data-cat="thought-alt" id="slot-alt-thought">
+        <div class="placeholder"><span class="plus">＋</span>מחשבה חלופית</div>
+      </div>
+      <div class="arrow-connector"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H4M9 6l-5 6 5 6"/></svg></div>
+      <div class="slot empty locked" data-row="alt" data-cat="emotion-alt" id="slot-alt-emotion">
+        <div class="placeholder"><span class="plus">＋</span>רגש חדש צפוי</div>
+      </div>
+    </div>
+    <div class="track row-alt" style="grid-template-columns:1fr auto 1fr; margin-top:10px;">
+      <div></div>
+      <div class="arrow-connector"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M20 12H4M9 6l-5 6 5 6"/></svg></div>
+      <div class="slot empty locked" data-row="alt" data-cat="action-alt" id="slot-alt-action">
+        <div class="placeholder"><span class="plus">＋</span>תוצאה רצויה</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn btn-primary" id="btn-summary" disabled>✦ צור/י כרטיס מציאות חדשה</button>
+    <button class="btn btn-ghost" id="btn-reset">↺ התחלה חדשה</button>
+    <button class="btn btn-ghost" id="btn-export-custom">⬇ ייצוא התוספות שלי</button>
+  </div>
+</div>
+
+<div id="summary">
+  <div class="summary-card" id="summary-card-content">
+    <div class="summary-title">כרטיס המציאות החדשה שלי</div>
+    <div class="summary-sub" id="summary-date"></div>
+    <div class="summary-cols">
+      <div class="summary-col real">
+        <h4>🔥 מה שקרה בפועל</h4>
+        <div id="summary-real"></div>
+      </div>
+      <div class="summary-col alt">
+        <h4>🌱 המציאות שאני בוחר לבסס</h4>
+        <div id="summary-alt"></div>
+      </div>
+    </div>
+  </div>
+  <div class="summary-actions">
+    <button class="btn btn-primary" id="btn-save-image">⬇ שמור כתמונה</button>
+    <button class="btn btn-ghost" id="btn-save-text">⬇ שמור כטקסט</button>
+    <button class="btn btn-ghost" id="btn-print">⎙ הדפסה</button>
+  </div>
+</div>
+
+<footer>נבנה עבור תרגול מודעות רגשית עצמי · מבוסס על מודל CBT (אירוע–מחשבה–רגש–תוצאה)</footer>
+
+<!-- picker overlay -->
+<div class="overlay" id="overlay">
+  <div class="drawer">
+    <button class="drawer-close" id="drawer-close">✕</button>
+    <h3 id="drawer-title">בחר/י קלף</h3>
+    <p class="hint" id="drawer-hint"></p>
+    <div id="drawer-suggest"></div>
+    <div class="pick-grid" id="pick-grid"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+/* ============================================================
+   ICON GLYPHS — coherent line-art library, one per concept.
+   Each returns inner SVG markup drawn on a 100x100 gradient blob.
+   ============================================================ */
+const STROKE = 'stroke="#fdf6ea" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+const FILLW = 'fill="#fdf6ea"';
+
+function blob(gradId, glyph){
+  return `<svg viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="46" fill="url(#${gradId})" filter="url(#grain-f)"/>
+    <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+    <g>${glyph}</g>
+  </svg>`;
+}
+
+const G = {
+  // ---- EVENTS ----
+  phoneSilent: `<rect x="34" y="24" width="32" height="52" rx="8" ${STROKE}/><circle cx="50" cy="66" r="2.5" ${FILLW}/><path d="M40 40h20M40 48h12" ${STROKE}/><path d="M70 30l6 6M76 30l-6 6" ${STROKE}/>`,
+  docX: `<rect x="30" y="22" width="40" height="52" rx="5" ${STROKE}/><path d="M38 34h24M38 42h24M38 50h14" ${STROKE}/><circle cx="58" cy="62" r="12" fill="#a5372a" opacity=".85"/><path d="M53 57l10 10M63 57l-10 10" stroke="#fdf6ea" stroke-width="4" stroke-linecap="round"/>`,
+  bubbleClash: `<circle cx="38" cy="42" r="16" ${STROKE}/><circle cx="66" cy="56" r="13" ${STROKE}/><path d="M46 52l-6 10 -2-8M74 66l4 9 -8-3" ${STROKE}/>`,
+  calendarX: `<rect x="26" y="28" width="48" height="42" rx="6" ${STROKE}/><path d="M26 40h48" ${STROKE}/><path d="M38 22v12M62 22v12" ${STROKE}/><path d="M42 50l16 16M58 50l-16 16" ${STROKE}/>`,
+  doorClosed: `<rect x="34" y="20" width="32" height="58" rx="3" ${STROKE}/><circle cx="58" cy="50" r="2.6" ${FILLW}/><path d="M20 78h60" ${STROKE}/>`,
+  megaphone: `<path d="M28 46v10l10 3V43z" ${STROKE}/><path d="M38 43l30-12v42l-30-14" ${STROKE}/><path d="M40 59l4 14h-8z" ${STROKE}/><path d="M74 40c4 4 4 12 0 16" ${STROKE}/>`,
+  heartsBolt: `<path d="M40 38c-6-8-20-3-16 8 3 8 16 16 16 16s13-8 16-16c4-11-10-16-16-8z" ${STROKE}/><path d="M60 30l-6 12h8l-6 12" ${STROKE}/>`,
+  clockRun: `<circle cx="42" cy="46" r="20" ${STROKE}/><path d="M42 34v12l9 6" ${STROKE}/><path d="M66 60l8 6-3 9M74 66l-9 2" ${STROKE}/>`,
+  screenCold: `<rect x="26" y="26" width="48" height="34" rx="5" ${STROKE}/><path d="M40 74h20M50 60v14" ${STROKE}/><path d="M40 42l6 4-6 4M60 42l-6 4 6 4" ${STROKE}/>`,
+  bulbOff: `<circle cx="50" cy="42" r="16" ${STROKE}/><path d="M44 58h12M46 66h8" ${STROKE}/><path d="M32 30l6 6M68 30l-6 6" ${STROKE}/>`,
+  bars: `<rect x="30" y="52" width="14" height="24" rx="3" ${STROKE}/><rect x="52" y="34" width="14" height="42" rx="3" ${STROKE}/><path d="M28 30l10-6 8 4 10-10" ${STROKE}/>`,
+  handStop: `<path d="M38 66V38a4 4 0 018 0v18M46 56V32a4 4 0 018 0v22M54 54V36a4 4 0 018 0v18M62 56V42a4 4 0 018 0v14c0 12-8 20-18 20h-6c-8 0-12-4-16-10l-8-14c-2-4 2-8 6-6l6 6" ${STROKE}/>`,
+  swirl: `<path d="M50 24a24 24 0 11-17 41" ${STROKE}/><path d="M33 65l-2 10 -10-4" ${STROKE}/>`,
+  eyeQ: `<path d="M22 50c8-14 20-20 28-20s20 6 28 20c-8 14-20 20-28 20s-20-6-28-20z" ${STROKE}/><circle cx="50" cy="50" r="7" ${STROKE}/><circle cx="50" cy="76" r="2.4" ${FILLW}/>`,
+  trophyBreak: `<path d="M38 26h24v14c0 8-6 14-12 14s-12-6-12-14V26z" ${STROKE}/><path d="M38 30h-8v6c0 6 4 9 8 9M62 30h8v6c0 6-4 9-8 9" ${STROKE}/><path d="M50 54v8M42 76h16l-3-10H45z" ${STROKE}/>`,
+  thermo: `<rect x="44" y="20" width="12" height="34" rx="6" ${STROKE}/><circle cx="50" cy="64" r="12" ${STROKE}/><path d="M50 30v28" stroke="#a5372a" stroke-width="4" stroke-linecap="round"/><path d="M66 34h6M66 42h6" ${STROKE}/>`,
+  // ---- THOUGHT / SYMBOL ICONS (used for auto + alt) ----
+  mirrorCrack: `<circle cx="50" cy="46" r="20" ${STROKE}/><path d="M50 26v14l-8 6 10 4-6 10" stroke="#fdf6ea" stroke-width="3" fill="none"/><path d="M38 68l24 0" ${STROKE}/>`,
+  gavel: `<path d="M38 30l14 14M46 26l16 16M28 50l14-14 8 8-14 14z" ${STROKE}/><path d="M30 62h28M44 48l-14 14" ${STROKE}/>`,
+  stormCloud: `<path d="M30 54a12 12 0 010-24 16 16 0 0130-6 12 12 0 018 22z" ${STROKE}/><path d="M40 60l-4 10M52 60l-4 12M64 58l-4 8" ${STROKE}/>`,
+  chain: `<rect x="30" y="34" width="16" height="24" rx="8" ${STROKE}/><rect x="52" y="42" width="16" height="24" rx="8" ${STROKE}/>`,
+  qMark: `<path d="M38 40a12 12 0 1116 12c-4 3-6 5-6 10" ${STROKE}/><circle cx="48" cy="72" r="2.6" ${FILLW}/>`,
+  aloneFig: `<circle cx="50" cy="34" r="8" ${STROKE}/><path d="M50 42v18M40 78l10-18 10 18M40 54l10 4 10-4" ${STROKE}/>`,
+  weightHead: `<circle cx="50" cy="34" r="10" ${STROKE}/><path d="M34 76c2-14 8-22 16-22s14 8 16 22" ${STROKE}/><path d="M40 44l20-4" ${STROKE}/>`,
+  brokenRecord: `<circle cx="50" cy="50" r="22" ${STROKE}/><path d="M50 50l14-14M50 28v8M50 64v8" ${STROKE}/>`,
+  mask: `<path d="M28 40c6-10 16-14 22-14s16 4 22 14c0 16-10 30-22 30s-22-14-22-30z" ${STROKE}/><path d="M40 42h4M56 42h4" ${STROKE}/><path d="M42 56c4 3 12 3 16 0" ${STROKE}/>`,
+  scaleUnfair: `<path d="M50 22v50" ${STROKE}/><path d="M28 34h44" ${STROKE}/><path d="M28 34l-8 16h16zM72 34l8 20H64z" ${STROKE}/><path d="M40 78h20" ${STROKE}/>`,
+  spiral: `<path d="M50 50 m-18 0 a18 18 0 1136 0 a12 12 0 11-24 0 a6 6 0 1112 0" ${STROKE}/>`,
+  // alt thoughts
+  openDoor: `<rect x="30" y="20" width="24" height="58" rx="2" ${STROKE}/><path d="M54 24l16 6v44l-16 4" ${STROKE}/><circle cx="46" cy="50" r="2.4" ${FILLW}/>`,
+  sunCloud: `<circle cx="42" cy="38" r="10" stroke="#fdf6ea" stroke-width="4" fill="none"/><path d="M42 22v4M42 50v4M26 38h4M58 38h4M30 26l3 3M54 50l3 3" stroke="#fdf6ea" stroke-width="3" stroke-linecap="round"/><path d="M36 62a12 12 0 010-24 16 16 0 0128 8h2a10 10 0 010 20H36z" ${STROKE}/>`,
+  seedling: `<path d="M50 78V50" ${STROKE}/><path d="M50 50c0-14-14-18-22-16 0 12 10 20 22 16z" ${STROKE}/><path d="M50 44c0-12 12-16 20-14 0 12-8 20-20 18z" ${STROKE}/>`,
+  openHand: `<path d="M32 54V32a4 4 0 018 0v16M40 46V26a4 4 0 018 0v20M48 46V30a4 4 0 018 0v16M56 48V38a4 4 0 018 0v14c0 12-6 22-18 22-8 0-12-4-16-10l-6-10c-2-4 2-8 6-5l6 5" ${STROKE}/>`,
+  bridge: `<path d="M20 60c8-14 52-14 60 0" ${STROKE}/><path d="M28 60v10M40 60v14M50 60v16M60 60v14M72 60v10" ${STROKE}/>`,
+  key: `<circle cx="36" cy="50" r="12" ${STROKE}/><path d="M46 50h30M68 50v10M76 50v8" ${STROKE}/>`,
+  hourglassCalm: `<path d="M34 24h32M34 76h32M36 24c0 14 10 18 14 26 4-8 14-12 14-26M36 76c0-14 10-18 14-26 4 8 14 12 14 26" ${STROKE}/>`,
+  waterDrop: `<path d="M50 22c10 16 18 26 18 36a18 18 0 11-36 0c0-10 8-20 18-36z" ${STROKE}/>`,
+  compass: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M58 42l-16 8 -6 16 16-8z" fill="#fdf6ea" opacity=".9"/>`,
+  // ---- EMOTIONS: face motif ----
+  faceAnger: (c)=>`<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M36 42l10 4M64 42l-10 4" ${STROKE}/><circle cx="40" cy="50" r="2.2" ${FILLW}/><circle cx="60" cy="50" r="2.2" ${FILLW}/><path d="M40 64c4-5 16-5 20 0" ${STROKE}/><path d="M70 30l6-2M74 36l6 0" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+  faceSad: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 46h4M60 46h4" ${STROKE}/><path d="M40 66c4-5 16-5 20 0" ${STROKE} transform="rotate(180 50 63)"/><path d="M62 54c2 4 1 8-2 10" stroke="#bcd7ff" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  faceShame: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M42 46l16 0" ${STROKE}/><ellipse cx="38" cy="56" rx="6" ry="3.5" fill="#ec8bb2" opacity=".7"/><ellipse cx="62" cy="56" rx="6" ry="3.5" fill="#ec8bb2" opacity=".7"/><path d="M44 64c3 2 9 2 12 0" ${STROKE}/>`,
+  faceGuilt: `<circle cx="50" cy="52" r="22" ${STROKE}/><path d="M38 46l8 4M62 46l-8 4" ${STROKE}/><path d="M40 66c4-4 16-4 20 0" ${STROKE} transform="rotate(180 50 63)"/><path d="M50 28v6" ${STROKE}/>`,
+  faceFear: `<circle cx="50" cy="50" r="24" ${STROKE}/><circle cx="41" cy="48" r="4" ${STROKE}/><circle cx="59" cy="48" r="4" ${STROKE}/><ellipse cx="50" cy="66" rx="7" ry="5" ${STROKE}/>`,
+  faceAnxiety: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M36 46 q4-6 8 0 q4-6 8 0" ${STROKE}/><path d="M48 46 q4-6 8 0 q4-6 8 0" ${STROKE}/><path d="M40 66h20" ${STROKE}/>`,
+  faceEnvy: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M36 48h10M54 48h10" ${STROKE}/><path d="M42 65c4-4 12-4 16 0" ${STROKE} transform="rotate(180 50 63)"/><path d="M64 34a10 10 0 018 4" stroke="#9fd6a9" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  faceLonely: `<circle cx="50" cy="50" r="24" ${STROKE}/><circle cx="42" cy="48" r="2.2" ${FILLW}/><circle cx="58" cy="48" r="2.2" ${FILLW}/><path d="M42 64h16" ${STROKE}/><circle cx="50" cy="50" r="30" stroke="rgba(255,255,255,.25)" stroke-width="1.5" fill="none" stroke-dasharray="3 5"/>`,
+  faceFrustration: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M38 44h10M52 44h10" ${STROKE}/><path d="M40 65c4-4 16-4 20 0" ${STROKE} transform="rotate(180 50 63)"/><path d="M66 28l4 6h-6l4 6" stroke="#f0cc7c" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  faceDisappoint: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 48h8M52 48h8" ${STROKE}/><path d="M40 64c5-6 15-6 20 0" ${STROKE} transform="rotate(180 50 61)"/>`,
+  faceRelief: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 48c2-2 6-2 8 0M52 48c2-2 6-2 8 0" ${STROKE}/><path d="M40 62c4 4 16 4 20 0" ${STROKE}/><path d="M28 34c4 2 4 8 0 10M72 34c-4 2-4 8 0 10" stroke="#9fd6a9" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  facePride: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 48c2-2 6-2 8 0M52 48c2-2 6-2 8 0" ${STROKE}/><path d="M40 62c4 4 16 4 20 0" ${STROKE}/><path d="M50 22l2 5 5 .5-4 3.5 1 5-4.5-2.5L45 36l1-5-4-3.5 5-.5z" fill="#f0cc7c"/>`,
+  faceJoy: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M38 46 q4-6 8 0M54 46 q4-6 8 0" ${STROKE}/><path d="M38 58c4 8 20 8 24 0" ${STROKE}/>`,
+  faceLove: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M36 46c-3-4-10-1-8 4 2 4 8 6 8 6s6-2 8-6c2-5-5-8-8-4z" fill="#ec8bb2"/><path d="M56 46c-3-4-10-1-8 4 2 4 8 6 8 6s6-2 8-6c2-5-5-8-8-4z" fill="#ec8bb2"/><path d="M40 62c4 4 16 4 20 0" ${STROKE}/>`,
+  faceConfident: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 47h8M52 47h8" ${STROKE}/><path d="M40 62h20" ${STROKE}/><path d="M50 22v6M74 50h-6M50 78v-6M26 50h6" stroke="#f0cc7c" stroke-width="2.4" stroke-linecap="round"/>`,
+  faceEmbarrass: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 46h8M52 46h8" ${STROKE}/><ellipse cx="38" cy="58" rx="7" ry="4" fill="#ec8bb2" opacity=".75"/><ellipse cx="62" cy="58" rx="7" ry="4" fill="#ec8bb2" opacity=".75"/><path d="M44 66q6 4 12 0" ${STROKE}/>`,
+  faceHope: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M40 48c2-2 6-2 8 0M52 48c2-2 6-2 8 0" ${STROKE}/><path d="M42 62c4 3 12 3 16 0" ${STROKE}/><path d="M50 20l2 5 5 .5-4 3.5 1 5-4.5-2.5-4.5 2.5 1-5-4-3.5 5-.5z" fill="#f0cc7c"/>`,
+  faceDespair: `<circle cx="50" cy="52" r="22" ${STROKE}/><path d="M38 46l16 0" ${STROKE}/><path d="M42 68c4-6 12-6 16 0" ${STROKE} transform="rotate(180 50 65)"/><path d="M32 40l-6 4M74 40l-6 4" ${STROKE}/>`,
+  faceSurprise: `<circle cx="50" cy="50" r="24" ${STROKE}/><circle cx="41" cy="47" r="3" ${FILLW}/><circle cx="59" cy="47" r="3" ${FILLW}/><ellipse cx="50" cy="64" rx="6" ry="7" ${STROKE}/>`,
+  faceDisgust: `<circle cx="50" cy="50" r="24" ${STROKE}/><path d="M36 46l8 2M64 46l-8 2" ${STROKE}/><path d="M40 62 q10 -8 20 0" ${STROKE}/>`,
+  // ---- ACTIONS ----
+  talkBubble: `<path d="M26 30h48v28H46l-10 10v-10H26z" ${STROKE}/><path d="M36 42h28M36 50h18" ${STROKE}/>`,
+  ear: `<path d="M42 60c-10-4-14-14-10-24 4-9 14-14 22-10 8 3 12 12 9 19-2 5-7 6-9 3-2-3 0-6 2-9" ${STROKE}/><path d="M46 66c0 6 6 8 10 4" ${STROKE}/>`,
+  lungs: `<path d="M50 24v20" ${STROKE}/><path d="M50 44c-4-10-18-12-22-4-4 8 0 24 10 28 6 2 10-2 12-8M50 44c4-10 18-12 22-4 4 8 0 24-10 28-6 2-10-2-12-8" ${STROKE}/>`,
+  penPaper: `<rect x="28" y="24" width="34" height="46" rx="4" ${STROKE}/><path d="M35 36h20M35 44h20M35 52h12" ${STROKE}/><path d="M60 56l14-14 6 6-14 14-8 2z" fill="#f0cc7c"/>`,
+  handshake: `<path d="M22 46l14-8 8 4M78 46l-14-8-8 4" ${STROKE}/><path d="M36 42l10 8-4 4 8 6-4 4 6 4" ${STROKE}/><path d="M64 42l-10 8 4 4-8 6 4 4-6 4" ${STROKE}/>`,
+  askHelp: `<circle cx="50" cy="34" r="9" ${STROKE}/><path d="M32 76c2-16 8-24 18-24s16 8 18 24" ${STROKE}/><path d="M28 60l-8-4M28 60l2 9" ${STROKE}/>`,
+  hourglassWait: `<path d="M34 24h32M34 76h32M36 24c0 14 10 18 14 26 4-8 14-12 14-26M36 76c0-14 10-18 14-26 4 8 14 12 14 26" ${STROKE}/><circle cx="50" cy="50" r="2" ${FILLW}/>`,
+  confetti: `<path d="M30 70l40-40" ${STROKE}/><rect x="26" y="26" width="6" height="6" fill="#f0cc7c"/><rect x="66" y="66" width="6" height="6" fill="#ec8bb2"/><circle cx="70" cy="30" r="3" fill="#9fd6a9"/><circle cx="30" cy="66" r="3" fill="#8b9adf"/><path d="M46 24l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6-4.5-4 6-1z" fill="#f0cc7c"/>`,
+  distance: `<circle cx="30" cy="42" r="7" ${STROKE}/><path d="M22 68c1-10 5-16 8-16s7 6 8 16" ${STROKE}/><path d="M50 50h24M68 44l6 6-6 6" ${STROKE}/>`,
+  shareHeart: `<circle cx="34" cy="38" r="8" ${STROKE}/><path d="M22 68c1-12 6-18 12-18s11 6 12 18" ${STROKE}/><path d="M62 40c-3-4-10-1-8 4 2 4 8 6 8 6s6-2 8-6c2-5-5-8-8-4z" fill="#ec8bb2"/>`,
+  footprints: `<ellipse cx="38" cy="34" rx="6" ry="9" transform="rotate(-15 38 34)" ${STROKE}/><ellipse cx="62" cy="52" rx="6" ry="9" transform="rotate(15 62 52)" ${STROKE}/><ellipse cx="40" cy="70" rx="6" ry="9" transform="rotate(-15 40 70)" ${STROKE}/>`,
+  waitSit: `<circle cx="50" cy="30" r="8" ${STROKE}/><path d="M38 70v-14c0-8 24-8 24 0v14M38 56h24" ${STROKE}/>`,
+  // ---- CUSTOM (user-added) marker ----
+  customSpark: `<path d="M50 22l6 20 20 6-20 6-6 20-6-20-20-6 20-6z" ${FILLW}/><path d="M28 66l6 2 2 6M70 30l4 1.5 1.5 4" stroke="#fdf6ea" stroke-width="3" stroke-linecap="round" fill="none"/>`,
+};
+
+const CAT_GRAD = {
+  event:'grad-event', thought:'grad-thought', 'thought-alt':'grad-thought-alt',
+  emotion:'grad-emotion', 'emotion-alt':'grad-emotion-alt',
+  action:'grad-action', 'action-alt':'grad-action-alt'
+};
+
+function iconSvg(glyphKey, cat, colorHint){
+  let g = G[glyphKey];
+  if (typeof g === 'function') g = g(colorHint||'#f0cc7c');
+  return blob(CAT_GRAD[cat], g || '');
+}
+
+/* ============================================================
+   DATA
+   ============================================================ */
+const EVENTS = [
+  {id:'e1', t:'חבר/ה לא ענה להודעה', icon:'phoneSilent'},
+  {id:'e2', t:'טעות בעבודה שהתגלתה', icon:'docX'},
+  {id:'e3', t:'מישהו קטע אותי בדיבור', icon:'bubbleClash'},
+  {id:'e4', t:'ביטלו תוכנית ברגע האחרון', icon:'calendarX'},
+  {id:'e5', t:'לא הוזמנתי לאירוע', icon:'doorClosed'},
+  {id:'e6', t:'ביקורת מהבוס', icon:'megaphone'},
+  {id:'e7', t:'ויכוח עם בן/בת זוג', icon:'heartsBolt'},
+  {id:'e8', t:'איחור של מישהו לפגישה', icon:'clockRun'},
+  {id:'e9', t:'תגובה קרה ברשת חברתית', icon:'screenCold'},
+  {id:'e10', t:'שכחתי משהו חשוב', icon:'bulbOff'},
+  {id:'e11', t:'השוואה לאדם שמצליח', icon:'bars'},
+  {id:'e12', t:'דחייה בבקשה שהעליתי', icon:'handStop'},
+  {id:'e13', t:'שינוי פתאומי בתוכנית', icon:'swirl'},
+  {id:'e14', t:'מבט מוזר ממישהו', icon:'eyeQ'},
+  {id:'e15', t:'כישלון במשימה חשובה', icon:'trophyBreak'},
+  {id:'e16', t:'מחלה או עייפות פתאומית', icon:'thermo'},
+  {id:'e17', t:'פוסט שהעליתי לא קיבל תגובות', icon:'screenCold'},
+  {id:'e18', t:'ריב עם הורה או ילד/ה', icon:'heartsBolt'},
+  {id:'e19', t:'חרדה לפני בדיקה רפואית', icon:'thermo'},
+  {id:'e20', t:'יום שלא הלך כמו שתכננתי', icon:'swirl'},
+];
+
+const THOUGHTS_AUTO = [
+  {id:'ta1', t:'לא אכפת לו/ה ממני', icon:'mirrorCrack'},
+  {id:'ta2', t:'אני תמיד מפשל/ת', icon:'brokenRecord'},
+  {id:'ta3', t:'כולם שופטים אותי', icon:'gavel'},
+  {id:'ta4', t:'אני לא מספיק טוב/ה', icon:'scaleUnfair'},
+  {id:'ta5', t:'זה יקרה שוב', icon:'stormCloud'},
+  {id:'ta6', t:'אני לגמרי לבד בזה', icon:'aloneFig'},
+  {id:'ta7', t:'הוא/היא עשו את זה בכוונה', icon:'chain'},
+  {id:'ta8', t:'אני חלש/ה כי כך אני מרגיש/ה', icon:'mask'},
+  {id:'ta9', t:'לעולם לא אצליח בזה', icon:'weightHead'},
+  {id:'ta10', t:'אני חייב/ת לשלוט בהכל', icon:'spiral'},
+  {id:'ta11', t:'אני נטל על אחרים', icon:'weightHead'},
+  {id:'ta12', t:'אין לי זכות להתלונן', icon:'chain'},
+  {id:'ta13', t:'עומד לקרות משהו רע', icon:'stormCloud'},
+  {id:'ta14', t:'אני חייב/ת להיות מושלם/ת', icon:'scaleUnfair'},
+];
+
+const THOUGHTS_ALT = [
+  {id:'tb1', t:'אולי הוא/היא עסוקים ולא קשור אליי', icon:'openDoor'},
+  {id:'tb2', t:'טעות אחת לא מגדירה אותי', icon:'sunCloud'},
+  {id:'tb3', t:'אין לי הוכחה שהם שופטים אותי', icon:'qMark'},
+  {id:'tb4', t:'אני עושה כמיטב יכולתי כרגע', icon:'seedling'},
+  {id:'tb5', t:'יכול להיות שיש הסבר אחר לגמרי', icon:'bridge'},
+  {id:'tb6', t:'גם אם קרה בעבר, לא חייב לחזור', icon:'compass'},
+  {id:'tb7', t:'מותר לי לבקש עזרה', icon:'openHand'},
+  {id:'tb8', t:'רגש הוא זמני, הוא יעבור', icon:'waterDrop'},
+  {id:'tb9', t:'אפשר ללמוד מזה בלי להעניש את עצמי', icon:'key'},
+  {id:'tb10', t:'אני לא חייב/ת לשלוט בהכל כדי להיות בסדר', icon:'hourglassCalm'},
+  {id:'tb11', t:'מותר לי לבקש מרחב לעצמי', icon:'openHand'},
+  {id:'tb12', t:'לכולם יש ימים קשים, גם לי מותר', icon:'sunCloud'},
+  {id:'tb13', t:'אני לא צריך/ה לדעת הכל עכשיו', icon:'qMark'},
+  {id:'tb14', t:'אפשר להתחיל מחדש בכל רגע', icon:'seedling'},
+];
+
+// map auto-thought id -> suggested alt-thought ids
+const SUGGEST_MAP = {
+  ta1:['tb1','tb7'], ta2:['tb2','tb9'], ta3:['tb3','tb1'], ta4:['tb4','tb2'],
+  ta5:['tb6','tb8'], ta6:['tb7','tb1'], ta7:['tb1','tb5'], ta8:['tb8','tb9'],
+  ta9:['tb4','tb9'], ta10:['tb10','tb8']
+};
+
+const EMOTIONS = [
+  {id:'m1', t:'כעס', icon:'faceAnger', family:'coral'},
+  {id:'m2', t:'עצב', icon:'faceSad', family:'indigo'},
+  {id:'m3', t:'בושה', icon:'faceShame', family:'magenta'},
+  {id:'m4', t:'אשמה', icon:'faceGuilt', family:'indigo'},
+  {id:'m5', t:'פחד', icon:'faceFear', family:'indigo'},
+  {id:'m6', t:'חרדה', icon:'faceAnxiety', family:'indigo'},
+  {id:'m7', t:'קנאה', icon:'faceEnvy', family:'sage'},
+  {id:'m8', t:'בדידות', icon:'faceLonely', family:'indigo'},
+  {id:'m9', t:'תסכול', icon:'faceFrustration', family:'coral'},
+  {id:'m10', t:'אכזבה', icon:'faceDisappoint', family:'indigo'},
+  {id:'m11', t:'הקלה', icon:'faceRelief', family:'sage'},
+  {id:'m12', t:'גאווה', icon:'facePride', family:'gold'},
+  {id:'m13', t:'שמחה', icon:'faceJoy', family:'gold'},
+  {id:'m14', t:'אהבה', icon:'faceLove', family:'magenta'},
+  {id:'m15', t:'ביטחון', icon:'faceConfident', family:'gold'},
+  {id:'m16', t:'מבוכה', icon:'faceEmbarrass', family:'magenta'},
+  {id:'m17', t:'תקווה', icon:'faceHope', family:'gold'},
+  {id:'m18', t:'ייאוש', icon:'faceDespair', family:'indigo'},
+  {id:'m19', t:'עייפות נפשית', icon:'faceDespair', family:'indigo'},
+  {id:'m20', t:'ניכור וריחוק', icon:'faceLonely', family:'indigo'},
+  {id:'m21', t:'שלווה', icon:'faceRelief', family:'sage'},
+  {id:'m22', t:'התרגשות', icon:'faceJoy', family:'gold'},
+];
+
+const ACTIONS = [
+  {id:'a1', t:'לדבר על זה בגלוי', icon:'talkBubble'},
+  {id:'a2', t:'לבקש הבהרה', icon:'ear'},
+  {id:'a3', t:'לקחת הפסקה ולנשום', icon:'lungs'},
+  {id:'a4', t:'לכתוב ביומן', icon:'penPaper'},
+  {id:'a5', t:'להתנצל', icon:'handshake'},
+  {id:'a6', t:'לבקש עזרה', icon:'askHelp'},
+  {id:'a7', t:'לתת לזמן לעבור', icon:'hourglassWait'},
+  {id:'a8', t:'לחגוג את ההצלחה', icon:'confetti'},
+  {id:'a9', t:'להתרחק זמנית', icon:'distance'},
+  {id:'a10', t:'לשתף מישהו קרוב', icon:'shareHeart'},
+  {id:'a11', t:'לפעול בכל זאת למרות הפחד', icon:'footprints'},
+  {id:'a12', t:'לחכות בשקט ולצפות', icon:'waitSit'},
+  {id:'a13', t:'לצאת להליכה בטבע', icon:'footprints'},
+  {id:'a14', t:'לפנות לאיש/אשת מקצוע', icon:'askHelp'},
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  event:null, thoughtAuto:null, emotionsReal:[], actionReal:null,
+  thoughtAlt:null, emotionsAlt:[], actionAlt:null
+};
+
+const catLists = {
+  event:EVENTS, thought:THOUGHTS_AUTO, 'thought-alt':THOUGHTS_ALT,
+  emotion:EMOTIONS, 'emotion-alt':EMOTIONS, action:ACTIONS, 'action-alt':ACTIONS
+};
+const catTitles = {
+  event:'בחר/י אירוע', thought:'מהי המחשבה האוטומטית?', 'thought-alt':'מהי מחשבה חלופית אפשרית?',
+  emotion:'אילו רגשות עלו? (עד 3)', 'emotion-alt':'אילו רגשות היו עולים עם המחשבה החדשה?',
+  action:'מה עשיתי בפועל?', 'action-alt':'מה תהיה התוצאה הרצויה?'
+};
+const catHints = {
+  event:'בחרו את המצב שהתרחש — נקודת הפתיחה המשותפת לשני הרצפים.',
+  thought:'המחשבה הראשונה שעלתה בראש, כמעט אוטומטית, לפני שהספקתם לחשוב עליה.',
+  'thought-alt':'אותו אירוע בדיוק — רק מחשבה אחרת שאפשר לבחור להאמין בה.',
+  emotion:'אפשר לבחור יותר מרגש אחד — רגשות מעורבים הם המצב הנפוץ.',
+  'emotion-alt':'איך תרגישו, סביר, אם תאמינו במחשבה החדשה?',
+  action:'התגובה או ההתנהגות שבאמת קרתה בעקבות הרגש.',
+  'action-alt':'הפעולה שהייתם רוצים לנקוט — המציאות שאתם בונים.'
+};
+
+let currentSlot = null; // {row, cat}
+let tempEmoSelection = []; // for emotion picker: [{id, intensity}]
+
+/* ============================================================
+   CUSTOM CARDS — user-written additions, shared across sessions
+   via window.storage when available (falls back to this-session-only).
+   ============================================================ */
+const STORAGE_KEY_FOR_CAT = {
+  event:'event', thought:'thought', 'thought-alt':'thought-alt',
+  emotion:'emotion', 'emotion-alt':'emotion', action:'action', 'action-alt':'action'
+};
+const TARGET_ARRAY_FOR_CAT = {
+  event:EVENTS, thought:THOUGHTS_AUTO, 'thought-alt':THOUGHTS_ALT,
+  emotion:EMOTIONS, 'emotion-alt':EMOTIONS, action:ACTIONS, 'action-alt':ACTIONS
+};
+const customStore = { event:[], thought:[], 'thought-alt':[], emotion:[], action:[] };
+const hasCloudStorage = (typeof window.storage !== 'undefined' && window.storage);
+
+async function loadCustomCards(){
+  for(const key of Object.keys(customStore)){
+    let arr = [];
+    if(hasCloudStorage){
+      try{
+        const res = await window.storage.get('custom-'+key, true);
+        if(res && res.value) arr = JSON.parse(res.value);
+      }catch(e){ arr = []; }
+    }
+    customStore[key] = arr;
+    const targetArrays = Object.entries(TARGET_ARRAY_FOR_CAT).filter(([cat])=>STORAGE_KEY_FOR_CAT[cat]===key).map(([,a])=>a);
+    const uniqueTargets = [...new Set(targetArrays)];
+    uniqueTargets.forEach(target=>{
+      arr.forEach(item=>{ if(!target.some(x=>x.id===item.id)) target.push(item); });
+    });
+  }
+}
+async function saveCustomCard(cat, item){
+  const key = STORAGE_KEY_FOR_CAT[cat];
+  customStore[key].push(item);
+  const target = TARGET_ARRAY_FOR_CAT[cat];
+  if(!target.some(x=>x.id===item.id)) target.push(item);
+  if(hasCloudStorage){
+    try{ await window.storage.set('custom-'+key, JSON.stringify(customStore[key]), true); }catch(e){ /* ignore */ }
+  }
+}
+const CUSTOM_CAT_LABELS = {
+  event:'אירועים', thought:'מחשבות אוטומטיות', 'thought-alt':'מחשבות חלופיות',
+  emotion:'רגשות', action:'פעולות ותוצאות'
+};
+function exportCustomCards(){
+  const dateStr = new Date().toLocaleDateString('he-IL', {year:'numeric', month:'long', day:'numeric'});
+  const lines = [];
+  lines.push('✦ מה קו-רגש — התוספות שהוספתי ✦');
+  lines.push(dateStr);
+  lines.push('');
+  let any = false;
+  Object.entries(customStore).forEach(([key, items])=>{
+    if(!items.length) return;
+    any = true;
+    lines.push('────────────────────────');
+    lines.push(CUSTOM_CAT_LABELS[key] || key);
+    lines.push('────────────────────────');
+    items.forEach(item=> lines.push(`• ${item.t}`));
+    lines.push('');
+  });
+  if(!any){
+    lines.push('עדיין לא נוספו קלפים משלי — אפשר להוסיף מתוך כל דלת בחירה.');
+  }
+  const text = lines.join('\n');
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'התוספות-שלי-מה-קו-רגש.txt';
+  link.click();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function cardMarkup(item, cat, extra){
+  return `<div class="card cat-${cat}">
+    <div class="icon-frame">${iconSvg(item.icon, cat, familyColor(item.family))}</div>
+    <div class="card-kicker">${catKicker(cat)}</div>
+    <div class="card-label">${item.t}</div>
+    ${extra||''}
+  </div>`;
+}
+function familyColor(f){
+  const m = {coral:'#e8604f', indigo:'#4a5a9e', magenta:'#c9457a', sage:'#4f8a5b', gold:'#c9932a'};
+  return m[f] || '#c9932a';
+}
+function catKicker(cat){
+  const m = {event:'אירוע', thought:'מחשבה', 'thought-alt':'מחשבה חדשה', emotion:'רגש',
+    'emotion-alt':'רגש חדש', action:'תוצאה', 'action-alt':'תוצאה חדשה'};
+  return m[cat];
+}
+
+function renderSlot(row, cat){
+  const el = document.getElementById(`slot-${row}-${cat.replace('-alt','')}`) ||
+             document.getElementById(`slot-${row}-${cat}`);
+}
+
+function updateAll(){
+  setSlot('real','event', state.event);
+  setSlot('real','thought', state.thoughtAuto, !state.event);
+  setSlotEmotion('real', state.emotionsReal, !state.thoughtAuto);
+  setSlot('real','action', state.actionReal, state.emotionsReal.length===0);
+
+  // alt event mirrors real event
+  const altEventSlot = document.getElementById('slot-alt-event');
+  if(state.event){
+    altEventSlot.classList.remove('locked');
+    altEventSlot.innerHTML = cardMarkup(state.event,'event');
+  } else {
+    altEventSlot.innerHTML = `<div class="placeholder">אותו אירוע (קבוע)</div>`;
+  }
+
+  setSlot('alt','thought-alt', state.thoughtAlt, !state.event);
+  setSlotEmotion('alt', state.emotionsAlt, !state.thoughtAlt, true);
+  setSlot('alt','action-alt', state.actionAlt, state.emotionsAlt.length===0);
+
+  const done = state.event && state.thoughtAuto && state.emotionsReal.length && state.actionReal &&
+               state.thoughtAlt && state.emotionsAlt.length && state.actionAlt;
+  document.getElementById('btn-summary').disabled = !done;
+}
+
+function setSlot(row, cat, value, locked){
+  const key = cat.replace('-alt','');
+  const el = document.getElementById(`slot-${row}-${key}`);
+  if(!el) return;
+  el.classList.toggle('locked', !!locked && !value);
+  if(value){
+    el.classList.remove('empty');
+    el.innerHTML = cardMarkup(value, cat) + `<button class="edit-x" title="שנה בחירה">✎</button>`;
+  } else {
+    el.classList.add('empty');
+    const label = catTitles[cat].replace('בחר/י ','').replace('?','');
+    el.innerHTML = `<div class="placeholder"><span class="plus">＋</span>${placeholderText(cat)}</div>`;
+  }
+}
+function placeholderText(cat){
+  const m = {event:'בחר/י אירוע', thought:'מחשבה אוטומטית', 'thought-alt':'מחשבה חלופית',
+    emotion:'רגש/ות שהתעוררו', 'emotion-alt':'רגש חדש צפוי', action:'מה עשיתי בפועל', 'action-alt':'תוצאה רצויה'};
+  return m[cat];
+}
+
+function setSlotEmotion(row, list, locked, isAlt){
+  const el = document.getElementById(`slot-${row}-emotion`);
+  el.classList.toggle('locked', !!locked && list.length===0);
+  if(list.length===0){
+    el.classList.add('empty');
+    el.innerHTML = `<div class="placeholder"><span class="plus">＋</span>${isAlt?'רגש חדש צפוי':'רגש/ות שהתעוררו'}</div>`;
+    return;
+  }
+  el.classList.remove('empty');
+  const cat = isAlt ? 'emotion-alt' : 'emotion';
+  const chips = list.map(en=>{
+    const item = EMOTIONS.find(e=>e.id===en.id);
+    const iconScale = (0.85 + (en.intensity/10)*0.5).toFixed(2);
+    return `<div class="emo-chip" data-eid="${en.id}">
+      <div class="emo-icon" style="transform:scale(${iconScale})">${iconSvg(item.icon, cat, familyColor(item.family))}</div>
+      <div class="emo-meta">
+        <div class="emo-name">${item.t}</div>
+        <div class="emo-val">עוצמה: <span data-eid="${en.id}" class="val-out">${en.intensity}</span>/10</div>
+        <input type="range" min="1" max="10" value="${en.intensity}" class="emo-slider" data-row="${row}" data-eid="${en.id}">
+      </div>
+      <button class="emo-remove" data-eid="${en.id}" title="הסר רגש">✕</button>
+    </div>`;
+  }).join('');
+  const addBtnHtml = list.length < 3
+    ? `<button class="emo-add-btn" type="button">＋ הוסף/י רגש נוסף</button>`
+    : `<div class="custom-add-note" style="text-align:center; opacity:.5;">הגעת למקסימום 3 רגשות</div>`;
+  el.innerHTML = `<div class="card emotion-multi cat-${cat}">
+      <div class="card-kicker">${catKicker(cat)}</div>
+      <div class="emo-chip-list">${chips}</div>
+      ${addBtnHtml}
+      <button class="edit-x" title="נהל/י את כל הבחירות">✎</button>
+    </div>`;
+  el.querySelectorAll('.emo-remove').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const eid = btn.dataset.eid;
+      const arr = row==='real'? state.emotionsReal : state.emotionsAlt;
+      const idx = arr.findIndex(x=>x.id===eid);
+      if(idx>-1) arr.splice(idx,1);
+      updateAll();
+    });
+  });
+  const addBtn = el.querySelector('.emo-add-btn');
+  if(addBtn){
+    addBtn.addEventListener('click', e=>{
+      e.stopPropagation();
+      openPicker(row, cat);
+    });
+  }
+  el.querySelectorAll('.emo-slider').forEach(sl=>{
+    sl.addEventListener('input', e=>{
+      e.stopPropagation();
+      const id = sl.dataset.eid;
+      const arr = row==='real'? state.emotionsReal : state.emotionsAlt;
+      const en = arr.find(x=>x.id===id);
+      en.intensity = parseInt(sl.value,10);
+      el.querySelector(`.val-out[data-eid="${id}"]`).textContent = en.intensity;
+      const chip = sl.closest('.emo-chip');
+      const icon = chip.querySelector('.emo-icon');
+      const scale = 0.85 + (en.intensity/10)*0.5;
+      icon.style.transform = `scale(${scale})`;
+    });
+    sl.addEventListener('click', e=>e.stopPropagation());
+  });
+}
+
+updateAll();
+
+/* ============================================================
+   SLOT CLICK -> OPEN PICKER
+   ============================================================ */
+document.querySelectorAll('.slot').forEach(slot=>{
+  slot.addEventListener('click', ()=>{
+    if(slot.classList.contains('locked')) return flashLock(slot);
+    const row = slot.dataset.row, cat = slot.dataset.cat;
+    openPicker(row, cat);
+  });
+});
+
+function flashLock(slot){
+  slot.style.transition='none';
+  slot.style.borderColor='#e8604f';
+  setTimeout(()=>{ slot.style.transition=''; slot.style.borderColor=''; }, 260);
+}
+
+const overlay = document.getElementById('overlay');
+const pickGrid = document.getElementById('pick-grid');
+const drawerTitle = document.getElementById('drawer-title');
+const drawerHint = document.getElementById('drawer-hint');
+const drawerSuggest = document.getElementById('drawer-suggest');
+
+function openPicker(row, cat){
+  currentSlot = {row, cat};
+  drawerTitle.textContent = catTitles[cat];
+  drawerHint.textContent = catHints[cat];
+  drawerSuggest.innerHTML = '';
+  const oldNote = document.getElementById('storage-note-tmp');
+  if(oldNote) oldNote.remove();
+
+  if(cat==='emotion' || cat==='emotion-alt'){
+    tempEmoSelection = (row==='real'? state.emotionsReal : state.emotionsAlt).map(x=>({...x}));
+  } else {
+    tempEmoSelection = [];
+  }
+
+  // suggestion note for alt thought
+  if(cat==='thought-alt' && state.thoughtAuto){
+    const sug = SUGGEST_MAP[state.thoughtAuto.id] || [];
+    if(sug.length){
+      const names = sug.map(id=>THOUGHTS_ALT.find(t=>t.id===id).t).join(' · ');
+      drawerSuggest.innerHTML = `<div class="suggest-note">💡 בהמשך למחשבה "${state.thoughtAuto.t}" — יכול להתאים: ${names}</div>`;
+    }
+  }
+
+  renderPickGrid(cat);
+
+  const noteTxt = hasCloudStorage
+    ? 'התוספות שלך נשמרות ומצטרפות לחפיסה המשותפת לכל מי ששיחק במשחק הזה.'
+    : 'התוספות שלך זמינות למשחק הנוכחי. כדי לצרף אותן לצמיתות, ייצא/י אותן בסוף ושלח/י לי.';
+  drawerHint.insertAdjacentHTML('afterend', `<div class="storage-note" id="storage-note-tmp">${noteTxt}</div>`);
+
+  overlay.classList.add('open');
+}
+
+function renderPickGrid(cat){
+  const list = catLists[cat];
+  pickGrid.innerHTML = list.map(item=>{
+    const selectedCls = isPreselected(item.id, cat) ? 'selected' : '';
+    const customCls = item.custom ? 'is-custom' : '';
+    const badge = item.custom ? `<span class="custom-badge">שלי</span>` : '';
+    return `<div class="pick-card ${selectedCls} ${customCls}" data-id="${item.id}">
+      <div class="icon-frame">${iconSvg(item.icon, cat, familyColor(item.family))}</div>
+      <div class="pc-label">${item.t}</div>
+      ${badge}
+    </div>`;
+  }).join('') + `
+    <div class="pick-card-add-wrap" style="grid-column:1/-1;">
+      <div class="custom-add">
+        <input type="text" id="custom-text-input" placeholder="לא מצאת מה שמתאים? כתוב/י כאן בעצמך...">
+        <button id="custom-add-btn" type="button">＋ הוסף/י לחפיסה</button>
+        <div class="custom-add-note">הקלף שלך יתווסף עם סמל ✦ ויהיה זמין לבחירה מיד.</div>
+      </div>
+    </div>`;
+
+  pickGrid.querySelectorAll('.pick-card[data-id]').forEach(pc=>{
+    pc.addEventListener('click', ()=>handlePick(pc, cat));
+  });
+
+  const addBtn = pickGrid.querySelector('#custom-add-btn');
+  const addInput = pickGrid.querySelector('#custom-text-input');
+  function submitCustom(){
+    const txt = addInput.value.trim();
+    if(!txt) { addInput.focus(); return; }
+    const familyDefault = {event:null, thought:null, 'thought-alt':null, emotion:'gold', 'emotion-alt':'gold', action:null, 'action-alt':null}[cat];
+    const item = { id:'custom-'+Date.now().toString(36), t:txt, icon:'customSpark', family:familyDefault, custom:true };
+    saveCustomCard(cat, item);
+    addInput.value='';
+    renderPickGrid(cat); // refresh grid with the new card included
+    // auto-select the newly added card
+    const newCardEl = pickGrid.querySelector(`.pick-card[data-id="${item.id}"]`);
+    if(newCardEl) handlePick(newCardEl, cat);
+  }
+  addBtn.addEventListener('click', submitCustom);
+  addInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitCustom(); } });
+}
+
+function isPreselected(id, cat){
+  if(cat==='emotion') return state.emotionsReal.some(e=>e.id===id);
+  if(cat==='emotion-alt') return state.emotionsAlt.some(e=>e.id===id);
+  return false;
+}
+
+function handlePick(pc, cat){
+  const id = pc.dataset.id;
+  const item = catLists[cat].find(x=>x.id===id);
+
+  if(cat==='emotion' || cat==='emotion-alt'){
+    const arr = cat==='emotion' ? state.emotionsReal : state.emotionsAlt;
+    const exists = arr.find(x=>x.id===id);
+    if(exists){
+      arr.splice(arr.indexOf(exists),1);
+      pc.classList.remove('selected');
+    } else {
+      if(arr.length>=3){ flashLock(pc); return; }
+      arr.push({id, intensity:5});
+      pc.classList.add('selected');
+    }
+    updateAll();
+    return; // stay open for multi-select
+  }
+
+  // single-select categories
+  if(cat==='event') state.event = item;
+  if(cat==='thought') state.thoughtAuto = item;
+  if(cat==='thought-alt') state.thoughtAlt = item;
+  if(cat==='action') state.actionReal = item;
+  if(cat==='action-alt') state.actionAlt = item;
+
+  updateAll();
+  closeDrawer();
+}
+
+document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeDrawer(); });
+function closeDrawer(){ overlay.classList.remove('open'); currentSlot=null; }
+
+/* card edit-x (event delegation) */
+document.getElementById('track-real').addEventListener('click', handleEditX);
+document.getElementById('track-alt').addEventListener('click', handleEditX);
+function handleEditX(e){
+  if(!e.target.classList.contains('edit-x')) return;
+  e.stopPropagation();
+  const slot = e.target.closest('.slot');
+  openPicker(slot.dataset.row, slot.dataset.cat);
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+document.getElementById('btn-reset').addEventListener('click', ()=>{
+  if(!confirm('להתחיל מסע חדש? כל הבחירות הנוכחיות יימחקו.')) return;
+  Object.assign(state, {event:null, thoughtAuto:null, emotionsReal:[], actionReal:null,
+    thoughtAlt:null, emotionsAlt:[], actionAlt:null});
+  updateAll();
+  document.getElementById('summary').classList.remove('open');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+document.getElementById('btn-summary').addEventListener('click', ()=>{
+  const dateStr = new Date().toLocaleDateString('he-IL', {year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('summary-date').textContent = dateStr;
+
+  document.getElementById('summary-real').innerHTML = summaryList([
+    ['אירוע', state.event],
+    ['מחשבה', state.thoughtAuto],
+  ]) + summaryEmoList(state.emotionsReal, 'emotion') + summaryList([['תוצאה', state.actionReal]]);
+
+  document.getElementById('summary-alt').innerHTML = summaryList([
+    ['אירוע', state.event],
+    ['מחשבה חדשה', state.thoughtAlt],
+  ]) + summaryEmoList(state.emotionsAlt, 'emotion-alt') + summaryList([['תוצאה רצויה', state.actionAlt]]);
+
+  document.getElementById('summary').classList.add('open');
+  document.getElementById('summary').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+function summaryList(pairs){
+  return pairs.map(([label,item])=>{
+    if(!item) return '';
+    return `<div class="summary-item">
+      <div class="si-icon">${iconSvg(item.icon, label==='תוצאה'||label==='תוצאה רצויה' ? (label==='תוצאה רצויה'?'action-alt':'action') : (label.includes('חדשה')?'thought-alt':'thought'), familyColor(item.family))}</div>
+      <div><b>${label}:</b> ${item.t}</div>
+    </div>`;
+  }).join('');
+}
+function summaryEmoList(list, cat){
+  if(!list.length) return '';
+  return list.map(en=>{
+    const item = EMOTIONS.find(e=>e.id===en.id);
+    return `<div class="summary-item">
+      <div class="si-icon">${iconSvg(item.icon, cat, familyColor(item.family))}</div>
+      <div><b>רגש:</b> ${item.t} (עוצמה ${en.intensity}/10)</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('btn-save-image').addEventListener('click', ()=>{
+  const node = document.getElementById('summary-card-content');
+  html2canvas(node, {backgroundColor:'#1c1020', scale:2}).then(canvas=>{
+    const link = document.createElement('a');
+    link.download = 'המציאות-החדשה-שלי.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+});
+
+function emoLine(list){
+  return list.map(en=>{
+    const item = EMOTIONS.find(e=>e.id===en.id);
+    return `   • ${item.t} (עוצמה ${en.intensity}/10)`;
+  }).join('\n');
+}
+
+function buildTextSummary(){
+  const dateStr = new Date().toLocaleDateString('he-IL', {year:'numeric', month:'long', day:'numeric'});
+  const lines = [];
+  lines.push('✦ מה קו-רגש — כרטיס המציאות החדשה שלי ✦');
+  lines.push(dateStr);
+  lines.push('');
+  lines.push('────────────────────────');
+  lines.push('🔥 מה שקרה בפועל');
+  lines.push('────────────────────────');
+  lines.push(`אירוע: ${state.event.t}`);
+  lines.push(`מחשבה אוטומטית: ${state.thoughtAuto.t}`);
+  lines.push('רגשות שעלו:');
+  lines.push(emoLine(state.emotionsReal));
+  lines.push(`תוצאה בפועל: ${state.actionReal.t}`);
+  lines.push('');
+  lines.push('────────────────────────');
+  lines.push('🌱 המציאות שאני בוחר לבסס');
+  lines.push('────────────────────────');
+  lines.push(`אירוע (אותו אירוע): ${state.event.t}`);
+  lines.push(`מחשבה חלופית: ${state.thoughtAlt.t}`);
+  lines.push('רגש חדש צפוי:');
+  lines.push(emoLine(state.emotionsAlt));
+  lines.push(`תוצאה רצויה: ${state.actionAlt.t}`);
+  lines.push('');
+  lines.push('נוצר במשחק "מה קו-רגש" — מבוסס על מודל אפר״ת (אירוע–פרשנות–רגש–תוצאה)');
+  return lines.join('\n');
+}
+
+document.getElementById('btn-save-text').addEventListener('click', ()=>{
+  const text = buildTextSummary();
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'המציאות-החדשה-שלי.txt';
+  link.click();
+});
+
+document.getElementById('btn-print').addEventListener('click', ()=>window.print());
+
+loadCustomCards();
+
+const exportBtn = document.getElementById('btn-export-custom');
+if(exportBtn) exportBtn.addEventListener('click', exportCustomCards);
+</script>
+</body>
+</html>
